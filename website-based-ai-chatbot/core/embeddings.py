@@ -13,19 +13,10 @@ class EmbeddingStore:
     def build(self, chunks):
         self.chunks = chunks
         texts = [c["text"] for c in chunks]
-
-        vectors = self.model.encode(
-            texts, show_progress_bar=True, normalize_embeddings=True
-        )
+        vectors = self.model.encode(texts, show_progress_bar=True)
 
         self.index = faiss.IndexFlatL2(vectors.shape[1])
         self.index.add(vectors)
-
-    def search(self, query, k=3):
-        q_vec = self.model.encode([query], normalize_embeddings=True)
-        distances, indices = self.index.search(q_vec, k)
-
-        return [self.chunks[i] for i in indices[0]]
 
     def save(self, path="vector_store"):
         os.makedirs(path, exist_ok=True)

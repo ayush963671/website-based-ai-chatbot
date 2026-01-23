@@ -19,29 +19,19 @@ if "chat" not in st.session_state:
 url = st.sidebar.text_input("Enter Website URL")
 
 if st.sidebar.button("Index Website"):
-    if not url:
-        st.sidebar.error("Please enter a URL")
-    else:
-        data = crawl_website(url)
-        cleaned = clean_text(data["text"])
+    data = crawl_website(url)
+    cleaned = clean_text(data["text"])
+    chunks = chunk_text(cleaned, data["url"], data["title"])
 
-        chunks = chunk_text(
-            text=cleaned,
-            source_url=data["url"],
-            page_title=data["title"],
-            chunk_size=200,
-            overlap=50
-        )
+    store = EmbeddingStore()
+    store.build(chunks)
+    store.save()
 
-        store = EmbeddingStore()
-        store.build(chunks)
-        store.save()
+    llm = OpenSourceLLM(model="tinyllama")
+    st.session_state.engine = QuestionAnswerEngine(store, llm)
+    st.session_state.chat = []
 
-        llm = OpenSourceLLM(model="llama3")
-        st.session_state.engine = QuestionAnswerEngine(store, llm)
-        st.session_state.chat = []
-
-        st.sidebar.success("Website indexed successfully")
+    st.sidebar.success("Website indexed successfully")
 
 if st.session_state.engine:
     for msg in st.session_state.chat:

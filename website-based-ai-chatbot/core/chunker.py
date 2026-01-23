@@ -27,17 +27,7 @@ def chunk_text(
                 }
             })
             cid += 1
-
-            # Word-accurate overlap
-            overlap_words = []
-            total = 0
-            for sent in reversed(current):
-                overlap_words.insert(0, sent)
-                total += len(sent.split())
-                if total >= overlap:
-                    break
-
-            current = overlap_words
+            current = current[-max(1, overlap // 20):]
             length = sum(len(x.split()) for x in current)
 
         current.append(s)

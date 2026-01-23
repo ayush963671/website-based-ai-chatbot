@@ -3,15 +3,12 @@ import re
 def clean_text(text: str) -> str:
     text = re.sub(r"[\x00-\x1f\x7f-\x9f]", " ", text)
     boilerplate = [
-        r"jump to content",
-        r"from wikipedia, the free encyclopedia",
-        r"navigation menu",
-        r"main menu",
-        r"edit",
+        r"Jump to content",
+        r"From Wikipedia, the free encyclopedia",
+        r"Navigation menu",
     ]
     for b in boilerplate:
         text = re.sub(b, " ", text, flags=re.IGNORECASE)
 
-    text = re.sub(r"\b(edit|view history|talk)\b", " ", text, flags=re.I)
     text = re.sub(r"\s+", " ", text)
     return text.strip()

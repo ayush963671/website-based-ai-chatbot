@@ -1,13 +1,17 @@
+from sentence_transformers import SentenceTransformer
 from core.retriever import Retriever
+
 
 class QuestionAnswerEngine:
     def __init__(self, store, llm):
         self.store = store
         self.llm = llm
+        self.embedder = SentenceTransformer("all-MiniLM-L6-v2")
         self.retriever = Retriever(store)
 
     def answer(self, question: str) -> str:
-        chunks = self.retriever.search(question, top_k=3)
+        q_vec = self.embedder.encode([question])
+        chunks = self.retriever.search(q_vec)
 
         if not chunks:
             return "The answer is not available on the provided website."

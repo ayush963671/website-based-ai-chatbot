@@ -13,9 +13,8 @@ class OpenSourceLLM:
             "options": {"temperature": 0}
         }
 
-        try:
-            r = requests.post(self.url, json=payload, timeout=60)
-            r.raise_for_status()
-            return r.json().get("response", "").strip()
-        except Exception:
+        r = requests.post(self.url, json=payload)
+        if r.status_code != 200:
             return "The answer is not available on the provided website."
+
+        return r.json().get("response", "").strip()
